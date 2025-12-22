@@ -1,5 +1,5 @@
 {
-  "name": "Excalidraw Project",
+  "name": "Collaborative Excalidraw",
   "private": true,
   "scripts": {
     "build": "turbo run build",

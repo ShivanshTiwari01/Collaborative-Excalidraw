@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
 export const authentication = async (
   req: Request,
@@ -6,7 +6,30 @@ export const authentication = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.headers.authorization;
+    const header = req.headers.authorization;
+    if (!header) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized access',
+      });
+    }
+
+    const token = header.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized access',
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      userId: string;
+    };
+
+    req.userId = decoded.userId;
+
+    next();
   } catch (error) {
     return res.status(400).json({
       success: false,

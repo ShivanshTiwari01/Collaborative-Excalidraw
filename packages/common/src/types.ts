@@ -1,9 +1,16 @@
 import { z } from 'zod';
 
 export const UserSchema = z.object({
-  id: z.string().uuid(),
   name: z.string().min(1).max(100),
-  email: z.string().email(),
-  createdAt: z.date(),
-  updatedAt: z.date().optional(),
+  username: z.string().min(3).max(20),
+  password: z.string().min(8).max(100),
+});
+
+export const signinSchema = z.object({
+  username: z.string().min(3).max(20),
+  password: z.string().min(8).max(100),
+});
+
+export const createRoomSchema = z.object({
+  name: z.string().min(1).max(100),
 });

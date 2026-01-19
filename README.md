@@ -1,135 +1,161 @@
-# Turborepo starter
+# Collaborative Excalidraw
 
-This Turborepo starter is maintained by the Turborepo core team.
+A real-time collaborative drawing application built with a monorepo architecture using Turborepo.
 
-## Using this example
+## Project Structure
 
-Run the following command:
-
-```sh
-npx create-turbo@latest
-```
-
-## What's inside?
-
-This Turborepo includes the following packages/apps:
+This monorepo contains a full-stack collaborative drawing application with the following components:
 
 ### Apps and Packages
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+#### Applications
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- `web`: A [Next.js](https://nextjs.org/) frontend application for the collaborative drawing interface
+- `http-backend`: Express.js REST API server for authentication and room management
+- `ws-backend`: WebSocket server for real-time collaboration features
+
+#### Packages
+
+- `@repo/ui`: Shared React component library used across applications
+- `@repo/common`: Shared types and validation schemas using Zod
+- `@repo/backend-common`: Shared backend utilities and configuration
+- `@repo/eslint-config`: ESLint configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `@repo/typescript-config`: Shared TypeScript configurations
+
+All packages and apps are 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### Utilities
 
-This Turborepo has some additional tools already setup for you:
+This Turborepo has the following tools setup:
 
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [ESLint](https://eslint.org/) for code linting
 - [Prettier](https://prettier.io) for code formatting
+- [Zod](https://zod.dev/) for runtime type validation
 
-### Build
+## Getting Started
 
-To build all apps and packages, run the following command:
+### Prerequisites
 
-```
-cd my-turborepo
+- Node.js (v18 or higher)
+- pnpm (recommended package manager)
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+### Installation
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```sh
+# Install dependencies
+pnpm install
 ```
 
-### Develop
+### Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+JWT_SECRET=your_secret_key_here
+```
+
+## Development
 
 To develop all apps and packages, run the following command:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+```sh
+# With global turbo installed (recommended)
 turbo dev
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
+# Without global turbo, use pnpm
 pnpm exec turbo dev
 ```
 
 You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+```sh
+# Run only the web app
 turbo dev --filter=web
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
+# Run only the backends
+turbo dev --filter=http-backend --filter=ws-backend
+
+# Using pnpm
 pnpm exec turbo dev --filter=web
 ```
 
-### Remote Caching
+### Development Servers
+
+- Web App: [http://localhost:3000](http://localhost:3000)
+- HTTP Backend: [http://localhost:3001](http://localhost:3001)
+- WebSocket Backend: [ws://localhost:8080](ws://localhost:8080)
+
+## Build
+
+To build all apps and packages:
+
+```sh
+# With global turbo installed (recommended)
+turbo build
+
+# Without global turbo
+pnpm exec turbo build
+```
+
+Build a specific package:
+
+```sh
+turbo build --filter=web
+pnpm exec turbo build --filter=http-backend
+```
+
+## API Endpoints
+
+### HTTP Backend (`http-backend`)
+
+- `POST /signup` - User registration
+- `POST /signin` - User authentication
+- `POST /room` - Create a new collaboration room
+
+### WebSocket Backend (`ws-backend`)
+
+- `ws://localhost:8080?token=<JWT_TOKEN>` - WebSocket connection for real-time collaboration
+
+## Architecture
+
+### Authentication Flow
+
+1. Users sign up/sign in via the HTTP backend
+2. JWT tokens are issued using [`JWT_SECRET`](packages/backend-common/src/index.ts)
+3. WebSocket connections authenticate using JWT tokens in query parameters
+4. The [`authentication`](apps/http-backend/src/middleware.ts) middleware verifies tokens for protected routes
+
+### Type Safety
+
+- Shared types are defined in [`@repo/common`](packages/common/src/types.ts) using Zod schemas
+- [`UserSchema`](packages/common/src/types.ts), [`signinSchema`](packages/common/src/types.ts), and [`createRoomSchema`](packages/common/src/types.ts) ensure type safety across frontend and backend
+
+## Remote Caching
 
 > [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+Turborepo can use [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines:
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+```sh
+# Authenticate with Vercel
 turbo login
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
+# Link your Turborepo to Remote Cache
 turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
 ```
 
 ## Useful Links
 
-Learn more about the power of Turborepo:
+Learn more about the technologies used:
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+- [Turborepo Documentation](https://turborepo.com/docs)
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Express.js Documentation](https://expressjs.com/)
+- [WebSocket Documentation](https://github.com/websockets/ws)
+- [Zod Documentation](https://zod.dev/)
+
+## License
+
+MIT

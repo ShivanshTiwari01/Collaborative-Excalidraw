@@ -1,5 +1,6 @@
 import express from 'express';
 import { JWT_SECRET } from '@repo/backend-common/config';
+import { prismaClient } from '@repo/db/client';
 
 const app = express();
 

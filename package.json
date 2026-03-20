@@ -1,5 +1,5 @@
 {
-  "name": "Collaborative Excalidraw",
+  "name": "sketchify",
   "private": true,
   "scripts": {
     "build": "turbo run build",

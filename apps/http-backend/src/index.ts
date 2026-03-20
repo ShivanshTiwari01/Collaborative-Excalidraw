@@ -1,14 +1,13 @@
 import express from 'express';
 import { JWT_SECRET } from '@repo/backend-common/config';
-import { prismaClient } from '@repo/db/client';
+import { db, user } from '@repo/db/client';
+import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
 const app = express();
+app.use(express.json());
 
 const PORT = 3001;
-
-const User = prismaClient.user;
-const Room = prismaClient.room;
 
 app.post('/signup', async (req, res) => {
   try {
@@ -20,7 +19,11 @@ app.post('/signup', async (req, res) => {
         .json({ message: 'Please provide all required fields' });
     }
 
-    const existingUser = await User.findUnique({ where: { email } });
+    const [existingUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.email, email))
+      .limit(1);
 
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
@@ -28,18 +31,20 @@ app.post('/signup', async (req, res) => {
 
     const encryptedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
-      data: {
+    const [newUser] = await db
+      .insert(user)
+      .values({
         email,
         password: encryptedPassword,
         firstName,
         lastName,
         image,
-      },
-    });
+      })
+      .returning();
 
     return res.status(201).json({ message: 'User created succesfully' });
   } catch (error) {
+    console.error(error);
     return res.status(400).json({ message: 'Failed to create user' });
   }
 });
@@ -54,7 +59,11 @@ app.post('/signin', async (req, res) => {
         .json({ message: 'Please provide email and password' });
     }
 
-    const existingUser = await User.findUnique({ where: { email } });
+    const [existingUser] = await db
+      .select()
+      .from(user)
+      .where(eq(user.email, email))
+      .limit(1);
 
     if (!existingUser) {
       return res.status(400).json({ message: 'User does not exist' });
@@ -71,6 +80,7 @@ app.post('/signin', async (req, res) => {
 
     return res.status(200).json({ message: 'User signed in successfully' });
   } catch (error) {
+    console.error(error);
     return res.status(400).json({ message: 'Failed to sign in' });
   }
 });

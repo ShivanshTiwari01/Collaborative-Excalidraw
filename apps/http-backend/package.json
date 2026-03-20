@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
+    "drizzle-orm": "^0.30.6",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3"
   },

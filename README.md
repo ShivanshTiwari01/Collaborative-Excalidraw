@@ -1,6 +1,6 @@
 # SKETCHIFY
 
-A real-time collaborative drawing application built with a monorepo architecture using Turborepo.
+A real-time collaborative drawing application built with a monorepo architecture using Turborepo where users can write and draw together.
 
 ## Project Structure
 
@@ -179,7 +179,7 @@ turbo login
 turbo link
 ```
 
-## Useful Links
+## Useful Links for reference
 
 Learn more about the technologies used:
 
